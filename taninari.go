@@ -9,10 +9,7 @@ import (
 	"time"
 )
 
-const limit = 12
-const blogPostEndPoint = "https://api.amebaowndme.com/v2/public/blogPosts?siteId=18381&searchType=recent"
-
-//&page=
+const blogPostEndpoint = "https://api.amebaowndme.com/v2/public/blogPosts?siteId=18381&searchType=recent&limit=15"
 
 type BlogPost struct {
 	Meta struct {
@@ -47,8 +44,8 @@ type Goroku struct {
 	PublishedAt  string
 }
 
-func getBlogPosts() string {
-	req, err := http.NewRequest("GET", blogPostEndPoint, nil)
+func getBlogPosts(api string) string {
+	req, err := http.NewRequest("GET", api, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -84,29 +81,39 @@ func parseJson(jsonStr string) (*BlogPost, error) {
 }
 
 func GetAllGorokus() []Goroku {
-	blogPostsStr := getBlogPosts()
-	blogPost, err := parseJson(blogPostsStr)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	gorokus := []Goroku{}
 
-	for _, post := range blogPost.Body {
-		goroku := Goroku{
-			PublishedURL: post.PublishedURL,
-			PublishedAt:  post.PublishedAt,
+	url := blogPostEndpoint
+	for {
+		blogPostsStr := getBlogPosts(url)
+		blogPost, err := parseJson(blogPostsStr)
+		if err != nil {
+			log.Fatal(err)
 		}
 
-		for _, content := range post.Contents {
-			if content.Type == "text" {
-				goroku.Text = content.Value
-			} else if content.Type == "image" {
-				goroku.ImageURL = content.Url
+		for _, post := range blogPost.Body {
+			goroku := Goroku{
+				PublishedURL: post.PublishedURL,
+				PublishedAt:  post.PublishedAt,
 			}
+
+			for _, content := range post.Contents {
+				if content.Type == "text" {
+					goroku.Text = content.Value
+				} else if content.Type == "image" {
+					goroku.ImageURL = content.Url
+				}
+			}
+
+			gorokus = append(gorokus, goroku)
 		}
 
-		gorokus = append(gorokus, goroku)
+		if len(gorokus) >= blogPost.Meta.Pagination.Total {
+			break
+		}
+
+		url = blogPostEndpoint + "&cursor=" + blogPost.Meta.Pagination.Cursors.After
+		time.Sleep(5 * time.Millisecond)
 	}
 
 	return gorokus
