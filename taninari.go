@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 )
 
 const limit = 12
@@ -81,7 +83,7 @@ func parseJson(jsonStr string) (*BlogPost, error) {
 	return blogPost, nil
 }
 
-func GetGorokus() []Goroku {
+func GetAllGorokus() []Goroku {
 	blogPostsStr := getBlogPosts()
 	blogPost, err := parseJson(blogPostsStr)
 	if err != nil {
@@ -108,4 +110,13 @@ func GetGorokus() []Goroku {
 	}
 
 	return gorokus
+}
+
+func GetGoroku() Goroku {
+	gorokus := GetAllGorokus()
+
+	rand.Seed(time.Now().UnixNano())
+	index := rand.Intn(len(gorokus))
+
+	return gorokus[index]
 }
