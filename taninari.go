@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"regexp"
 	"time"
 )
 
@@ -91,6 +92,8 @@ func GetAllGorokus() []Goroku {
 			log.Fatal(err)
 		}
 
+		tagRegexp, _ := regexp.Compile("\\<[\\S\\s]+?\\>")
+
 		for _, post := range blogPost.Body {
 			goroku := Goroku{
 				PublishedURL: post.PublishedURL,
@@ -99,7 +102,8 @@ func GetAllGorokus() []Goroku {
 
 			for _, content := range post.Contents {
 				if content.Type == "text" {
-					goroku.Text = content.Value
+					text := tagRegexp.ReplaceAllString(content.Value, "")
+					goroku.Text = text
 				} else if content.Type == "image" {
 					goroku.ImageURL = content.Url
 				}
