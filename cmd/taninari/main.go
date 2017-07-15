@@ -35,5 +35,15 @@ func main() {
 
 		return nil
 	}
+	app.Commands = []cli.Command{
+		{
+			Name:  "patriot",
+			Usage: "launch a missile",
+			Action: func(c *cli.Context) error {
+				ShowPatriot()
+				return nil
+			},
+		},
+	}
 	app.Run(os.Args)
 }
