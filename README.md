@@ -12,6 +12,15 @@ go get github.com/shiftky/go-taninari/...
 
 ## Usage
 
+### Command
+
+```bash
+% taninari
+% taninari help
+```
+
+### Library
+
 ```go
 package main
 
