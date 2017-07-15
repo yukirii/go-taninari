@@ -1,8 +1,7 @@
-package main
+package taninari
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -109,17 +108,4 @@ func GetGorokus() []Goroku {
 	}
 
 	return gorokus
-}
-
-func main() {
-	gorokus := GetGorokus()
-
-	for _, goroku := range gorokus {
-		fmt.Println(goroku.Text)
-		if goroku.ImageURL != "" {
-			fmt.Println(goroku.ImageURL)
-		}
-		fmt.Println(goroku.PublishedURL)
-		fmt.Println(goroku.PublishedAt)
-	}
 }
