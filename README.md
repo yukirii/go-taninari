@@ -6,7 +6,7 @@
 ## Installation
 
 ```bash
-go get github.com/shiftky/go-taninari/...
+$ go get github.com/shiftky/go-taninari/...
 ```
 
 
@@ -15,8 +15,8 @@ go get github.com/shiftky/go-taninari/...
 ### Command
 
 ```bash
-% taninari
-% taninari help
+$ taninari
+$ taninari help
 ```
 
 ### Library
