@@ -12,6 +12,8 @@ import (
 
 const blogPostEndpoint = "https://api.amebaowndme.com/v2/public/blogPosts?siteId=18381&searchType=recent&limit=15"
 
+var tagRegexp = regexp.MustCompile(`<[\S\s]+?>`)
+
 type BlogPost struct {
 	Meta struct {
 		Code       int `json:"code"`
@@ -83,8 +85,6 @@ func parseJson(jsonStr string) (*BlogPost, error) {
 
 func GetAllGorokus() ([]*Goroku, error) {
 	gorokus := []*Goroku{}
-
-	tagRegexp, _ := regexp.Compile("\\<[\\S\\s]+?\\>")
 
 	url := blogPostEndpoint
 	for {
