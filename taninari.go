@@ -84,7 +84,7 @@ func parseJson(jsonStr string) (*BlogPost, error) {
 }
 
 func GetAllGorokus() ([]*Goroku, error) {
-	gorokus := []*Goroku{}
+	var gorokus []*Goroku
 
 	url := blogPostEndpoint
 	for {
