@@ -2,8 +2,8 @@ package taninari
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
-	"log"
 	"math/rand"
 	"net/http"
 	"regexp"
@@ -11,6 +11,8 @@ import (
 )
 
 const blogPostEndpoint = "https://api.amebaowndme.com/v2/public/blogPosts?siteId=18381&searchType=recent&limit=15"
+
+var tagRegexp = regexp.MustCompile(`<[\S\s]+?>`)
 
 type BlogPost struct {
 	Meta struct {
@@ -45,29 +47,29 @@ type Goroku struct {
 	PublishedAt  string
 }
 
-func getBlogPosts(api string) string {
+func getBlogPosts(api string) (string, error) {
 	req, err := http.NewRequest("GET", api, nil)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		log.Fatal(res)
+		return "", fmt.Errorf("Error: status code is", res.StatusCode)
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
-	return string(body)
+	return string(body), nil
 }
 
 func parseJson(jsonStr string) (*BlogPost, error) {
@@ -81,31 +83,33 @@ func parseJson(jsonStr string) (*BlogPost, error) {
 	return blogPost, nil
 }
 
-func GetAllGorokus() []Goroku {
-	gorokus := []Goroku{}
+func GetAllGorokus() ([]*Goroku, error) {
+	var gorokus []*Goroku
 
 	url := blogPostEndpoint
 	for {
-		blogPostsStr := getBlogPosts(url)
-		blogPost, err := parseJson(blogPostsStr)
+		blogPostsJson, err := getBlogPosts(url)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 
-		tagRegexp, _ := regexp.Compile("\\<[\\S\\s]+?\\>")
+		blogPost, err := parseJson(blogPostsJson)
+		if err != nil {
+			return nil, err
+		}
 
-		for _, post := range blogPost.Body {
-			goroku := Goroku{
-				PublishedURL: post.PublishedURL,
-				PublishedAt:  post.PublishedAt,
+		for _, b := range blogPost.Body {
+			goroku := &Goroku{
+				PublishedURL: b.PublishedURL,
+				PublishedAt:  b.PublishedAt,
 			}
 
-			for _, content := range post.Contents {
-				if content.Type == "text" {
-					text := tagRegexp.ReplaceAllString(content.Value, "")
-					goroku.Text = text
-				} else if content.Type == "image" {
-					goroku.ImageURL = content.Url
+			for _, c := range b.Contents {
+				if c.Type == "text" {
+					t := tagRegexp.ReplaceAllString(c.Value, "")
+					goroku.Text = t
+				} else if c.Type == "image" {
+					goroku.ImageURL = c.Url
 				}
 			}
 
@@ -120,14 +124,17 @@ func GetAllGorokus() []Goroku {
 		time.Sleep(5 * time.Millisecond)
 	}
 
-	return gorokus
+	return gorokus, nil
 }
 
-func GetGoroku() Goroku {
-	gorokus := GetAllGorokus()
+func GetGoroku() (*Goroku, error) {
+	gorokus, err := GetAllGorokus()
+	if err != nil {
+		return nil, err
+	}
 
 	rand.Seed(time.Now().UnixNano())
 	index := rand.Intn(len(gorokus))
 
-	return gorokus[index]
+	return gorokus[index], nil
 }

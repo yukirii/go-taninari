@@ -26,11 +26,12 @@ package main
 
 import (
     "fmt"
+    "log"
 
     "github.com/shiftky/go-taninari"
 )
 
-func Show(goroku taninari.Goroku) {
+func Show(goroku *taninari.Goroku) {
     fmt.Println(goroku.PublishedAt)
     fmt.Println(goroku.Text)
     if goroku.ImageURL != "" {
@@ -41,11 +42,17 @@ func Show(goroku taninari.Goroku) {
 
 func main() {
     // 語録からランダムに 1 件取得
-    goroku := taninari.GetGoroku()
+    goroku, err := taninari.GetGoroku()
+    if err != nil {
+        log.Fatal(err)
+    }
     Show(goroku)
 
     // 語録の全取得
-    gorokus := taninari.GetAllGorokus()
+    gorokus, err := taninari.GetAllGorokus()
+    if err != nil {
+        log.Fatal(err)
+    }
     for _, goroku := range gorokus {
         Show(goroku)
         fmt.Print("\n")
