@@ -88,12 +88,12 @@ func GetAllGorokus() ([]*Goroku, error) {
 
 	url := blogPostEndpoint
 	for {
-		blogPostsStr, err := getBlogPosts(url)
+		blogPostsJson, err := getBlogPosts(url)
 		if err != nil {
 			return nil, err
 		}
 
-		blogPost, err := parseJson(blogPostsStr)
+		blogPost, err := parseJson(blogPostsJson)
 		if err != nil {
 			return nil, err
 		}
