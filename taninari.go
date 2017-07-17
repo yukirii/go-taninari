@@ -2,8 +2,8 @@ package taninari
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
-	"log"
 	"math/rand"
 	"net/http"
 	"regexp"
@@ -45,29 +45,29 @@ type Goroku struct {
 	PublishedAt  string
 }
 
-func getBlogPosts(api string) string {
+func getBlogPosts(api string) (string, error) {
 	req, err := http.NewRequest("GET", api, nil)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		log.Fatal(res)
+		return "", fmt.Errorf("Error: status code is", res.StatusCode)
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
-	return string(body)
+	return string(body), nil
 }
 
 func parseJson(jsonStr string) (*BlogPost, error) {
@@ -81,21 +81,25 @@ func parseJson(jsonStr string) (*BlogPost, error) {
 	return blogPost, nil
 }
 
-func GetAllGorokus() []Goroku {
-	gorokus := []Goroku{}
+func GetAllGorokus() ([]*Goroku, error) {
+	gorokus := []*Goroku{}
+
+	tagRegexp, _ := regexp.Compile("\\<[\\S\\s]+?\\>")
 
 	url := blogPostEndpoint
 	for {
-		blogPostsStr := getBlogPosts(url)
-		blogPost, err := parseJson(blogPostsStr)
+		blogPostsStr, err := getBlogPosts(url)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 
-		tagRegexp, _ := regexp.Compile("\\<[\\S\\s]+?\\>")
+		blogPost, err := parseJson(blogPostsStr)
+		if err != nil {
+			return nil, err
+		}
 
 		for _, post := range blogPost.Body {
-			goroku := Goroku{
+			goroku := &Goroku{
 				PublishedURL: post.PublishedURL,
 				PublishedAt:  post.PublishedAt,
 			}
@@ -120,14 +124,17 @@ func GetAllGorokus() []Goroku {
 		time.Sleep(5 * time.Millisecond)
 	}
 
-	return gorokus
+	return gorokus, nil
 }
 
-func GetGoroku() Goroku {
-	gorokus := GetAllGorokus()
+func GetGoroku() (*Goroku, error) {
+	gorokus, err := GetAllGorokus()
+	if err != nil {
+		return nil, err
+	}
 
 	rand.Seed(time.Now().UnixNano())
 	index := rand.Intn(len(gorokus))
 
-	return gorokus[index]
+	return gorokus[index], nil
 }
