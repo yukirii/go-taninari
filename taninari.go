@@ -98,18 +98,18 @@ func GetAllGorokus() ([]*Goroku, error) {
 			return nil, err
 		}
 
-		for _, post := range blogPost.Body {
+		for _, b := range blogPost.Body {
 			goroku := &Goroku{
-				PublishedURL: post.PublishedURL,
-				PublishedAt:  post.PublishedAt,
+				PublishedURL: b.PublishedURL,
+				PublishedAt:  b.PublishedAt,
 			}
 
-			for _, content := range post.Contents {
-				if content.Type == "text" {
-					text := tagRegexp.ReplaceAllString(content.Value, "")
-					goroku.Text = text
-				} else if content.Type == "image" {
-					goroku.ImageURL = content.Url
+			for _, c := range b.Contents {
+				if c.Type == "text" {
+					t := tagRegexp.ReplaceAllString(c.Value, "")
+					goroku.Text = t
+				} else if c.Type == "image" {
+					goroku.ImageURL = c.Url
 				}
 			}
 
