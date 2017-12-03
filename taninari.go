@@ -41,7 +41,7 @@ type BlogPost struct {
 	} `json:"body"`
 }
 
-type Goroku struct {
+type GorokuMessage struct {
 	Text         string
 	ImageURL     string
 	PublishedURL string
@@ -84,8 +84,8 @@ func parseJson(jsonStr string) (*BlogPost, error) {
 	return blogPost, nil
 }
 
-func GetAllGorokus() ([]*Goroku, error) {
-	var gorokus []*Goroku
+func GetAllMessages() ([]*GorokuMessage, error) {
+	var messages []*GorokuMessage
 
 	url := blogPostEndpoint
 	for {
@@ -100,7 +100,7 @@ func GetAllGorokus() ([]*Goroku, error) {
 		}
 
 		for _, b := range blogPost.Body {
-			goroku := &Goroku{
+			message := &GorokuMessage{
 				PublishedURL: b.PublishedURL,
 				PublishedAt:  b.PublishedAt,
 			}
@@ -108,16 +108,16 @@ func GetAllGorokus() ([]*Goroku, error) {
 			for _, c := range b.Contents {
 				if c.Type == "text" {
 					t := tagRegexp.ReplaceAllString(c.Value, "")
-					goroku.Text = t
+					message.Text = t
 				} else if c.Type == "image" {
-					goroku.ImageURL = c.Url
+					message.ImageURL = c.Url
 				}
 			}
 
-			gorokus = append(gorokus, goroku)
+			messages = append(messages, message)
 		}
 
-		if len(gorokus) >= blogPost.Meta.Pagination.Total {
+		if len(messages) >= blogPost.Meta.Pagination.Total {
 			break
 		}
 
@@ -125,42 +125,42 @@ func GetAllGorokus() ([]*Goroku, error) {
 		time.Sleep(5 * time.Millisecond)
 	}
 
-	return gorokus, nil
+	return messages, nil
 }
 
-func SearchGorokus(keyword string) ([]*Goroku, error) {
-	gorokus, err := GetAllGorokus()
+func SearchMessages(keyword string) ([]*GorokuMessage, error) {
+	messages, err := GetAllMessages()
 	if err != nil {
 		return nil, err
 	}
 
-	var searchGorokus []*Goroku
-	for _, goroku := range gorokus {
-		if strings.Contains(goroku.Text, keyword) && goroku.ImageURL == "" {
-			searchGorokus = append(searchGorokus, goroku)
+	var searchMessages []*GorokuMessage
+	for _, message := range messages {
+		if strings.Contains(message.Text, keyword) && message.ImageURL == "" {
+			searchMessages = append(searchMessages, message)
 		}
 	}
 
-	return searchGorokus, nil
+	return searchMessages, nil
 }
 
-func GetRandomGoroku() (*Goroku, error) {
-	gorokus, err := GetAllGorokus()
+func GetRandomMessage() (*GorokuMessage, error) {
+	messages, err := GetAllMessages()
 	if err != nil {
 		return nil, err
 	}
 
-	var goroku *Goroku
+	var message *GorokuMessage
 
 	for {
 		rand.Seed(time.Now().UnixNano())
-		index := rand.Intn(len(gorokus))
+		index := rand.Intn(len(messages))
 
-		if gorokus[index].ImageURL == "" {
-			goroku = gorokus[index]
+		if messages[index].ImageURL == "" {
+			message = messages[index]
 			break
 		}
 	}
 
-	return goroku, nil
+	return message, nil
 }

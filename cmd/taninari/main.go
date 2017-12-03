@@ -10,10 +10,10 @@ import (
 
 const cliVersion = "0.2.0"
 
-func Show(goroku *taninari.Goroku) {
-	fmt.Println("たになり語録 - " + goroku.PublishedAt)
-	fmt.Println(goroku.Text)
-	fmt.Println(goroku.PublishedURL)
+func Show(message *taninari.GorokuMessage) {
+	fmt.Println("たになり語録 - " + message.PublishedAt)
+	fmt.Println(message.Text)
+	fmt.Println(message.PublishedURL)
 }
 
 func main() {
@@ -22,8 +22,8 @@ func main() {
 	app.Usage = "人生楽しんでますか？"
 	app.Version = cliVersion
 	app.Action = func(c *cli.Context) error {
-		goroku, _ := taninari.GetRandomGoroku()
-		Show(goroku)
+		message, _ := taninari.GetRandomMessage()
+		Show(message)
 		return nil
 	}
 	app.Commands = []cli.Command{
@@ -39,14 +39,14 @@ func main() {
 
 				fmt.Println("Keyword: " + c.Args().Get(0))
 
-				gorokus, _ := taninari.SearchGorokus(c.Args().Get(0))
+				messages, _ := taninari.SearchMessages(c.Args().Get(0))
 
-				cnt := len(gorokus)
+				cnt := len(messages)
 				if cnt > 0 {
 					fmt.Println(cnt, "個のメッセージがみつかりましたね。")
-					for i, goroku := range gorokus {
-						fmt.Println("\n\x1b[32m", i+1, goroku.Text, "\x1b[0m")
-						fmt.Println(goroku.PublishedURL, "-", goroku.PublishedAt)
+					for i, message := range messages {
+						fmt.Println("\n\x1b[32m", i+1, message.Text, "\x1b[0m")
+						fmt.Println(message.PublishedURL, "-", message.PublishedAt)
 					}
 				} else {
 					fmt.Println("むむむ。何も見つからなかったみたいですね。")
