@@ -127,14 +127,23 @@ func GetAllGorokus() ([]*Goroku, error) {
 	return gorokus, nil
 }
 
-func GetGoroku() (*Goroku, error) {
+func GetRandomGoroku() (*Goroku, error) {
 	gorokus, err := GetAllGorokus()
 	if err != nil {
 		return nil, err
 	}
 
-	rand.Seed(time.Now().UnixNano())
-	index := rand.Intn(len(gorokus))
+	var goroku *Goroku
 
-	return gorokus[index], nil
+	for {
+		rand.Seed(time.Now().UnixNano())
+		index := rand.Intn(len(gorokus))
+
+		if gorokus[index].ImageURL == "" {
+			goroku = gorokus[index]
+			break
+		}
+	}
+
+	return goroku, nil
 }

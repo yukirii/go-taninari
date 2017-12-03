@@ -10,7 +10,7 @@ import (
 
 const cliVersion = "0.1.0"
 
-func Show(goroku taninari.Goroku) {
+func Show(goroku *taninari.Goroku) {
 	fmt.Println("たになり語録 - " + goroku.PublishedAt)
 	fmt.Println(goroku.Text)
 	fmt.Println(goroku.PublishedURL)
@@ -22,17 +22,8 @@ func main() {
 	app.Usage = "人生楽しんでますか？"
 	app.Version = cliVersion
 	app.Action = func(c *cli.Context) error {
-		var goroku taninari.Goroku
-
-		for {
-			goroku = taninari.GetGoroku()
-			if goroku.ImageURL == "" {
-				break
-			}
-		}
-
+		goroku, _ := taninari.GetRandomGoroku()
 		Show(goroku)
-
 		return nil
 	}
 	app.Commands = []cli.Command{
