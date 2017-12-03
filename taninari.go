@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -125,6 +126,22 @@ func GetAllGorokus() ([]*Goroku, error) {
 	}
 
 	return gorokus, nil
+}
+
+func SearchGorokus(keyword string) ([]*Goroku, error) {
+	gorokus, err := GetAllGorokus()
+	if err != nil {
+		return nil, err
+	}
+
+	var searchGorokus []*Goroku
+	for _, goroku := range gorokus {
+		if strings.Contains(goroku.Text, keyword) && goroku.ImageURL == "" {
+			searchGorokus = append(searchGorokus, goroku)
+		}
+	}
+
+	return searchGorokus, nil
 }
 
 func GetRandomGoroku() (*Goroku, error) {
