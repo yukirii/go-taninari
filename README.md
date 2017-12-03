@@ -25,38 +25,48 @@ $ taninari help
 package main
 
 import (
-    "fmt"
-    "log"
+	"fmt"
+	"log"
 
-    "github.com/shiftky/go-taninari"
+	"github.com/shiftky/go-taninari"
 )
 
-func Show(goroku *taninari.Goroku) {
-    fmt.Println(goroku.PublishedAt)
-    fmt.Println(goroku.Text)
-    if goroku.ImageURL != "" {
-        fmt.Println(goroku.ImageURL)
-    }
-    fmt.Println(goroku.PublishedURL)
+func Show(msg *taninari.GorokuMessage) {
+	fmt.Println(msg.PublishedAt)
+	fmt.Println(msg.Text)
+	if msg.ImageURL != "" {
+		fmt.Println(msg.ImageURL)
+	}
+	fmt.Println(msg.PublishedURL)
 }
 
 func main() {
-    // 語録からランダムに 1 件取得
-    goroku, err := taninari.GetGoroku()
-    if err != nil {
-        log.Fatal(err)
-    }
-    Show(goroku)
+	// 語録からランダムに 1 件取得
+	msg, err := taninari.GetRandomMessage()
+	if err != nil {
+		log.Fatal(err)
+	}
+	Show(msg)
 
-    // 語録の全取得
-    gorokus, err := taninari.GetAllGorokus()
-    if err != nil {
-        log.Fatal(err)
-    }
-    for _, goroku := range gorokus {
-        Show(goroku)
-        fmt.Print("\n")
-    }
+	// 語録の全取得
+	msgs, err := taninari.GetAllMessages()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, msg := range msgs {
+		Show(msg)
+		fmt.Print("\n")
+	}
+
+	// 語録から検索
+	msgs, err = taninari.SearchMessages("グレープフルーツ")
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, msg = range msgs {
+		Show(msg)
+		fmt.Print("\n")
+	}
 }
 ```
 
