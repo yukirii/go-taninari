@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/shiftky/go-taninari"
 	"github.com/urfave/cli"
+	"github.com/yukirii/go-taninari"
 )
 
 const cliVersion = "0.2.0"

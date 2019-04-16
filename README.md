@@ -6,7 +6,7 @@
 ## Installation
 
 ```bash
-$ go get github.com/shiftky/go-taninari/...
+$ go get github.com/yukirii/go-taninari/...
 ```
 
 
@@ -28,7 +28,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/shiftky/go-taninari"
+	"github.com/yukirii/go-taninari"
 )
 
 func Show(msg *taninari.GorokuMessage) {
@@ -73,4 +73,4 @@ func main() {
 
 ## License
 
-[MIT](https://github.com/shiftky/go-taninari/blob/master/LICENSE)
+[MIT](https://github.com/yukirii/go-taninari/blob/master/LICENSE)
